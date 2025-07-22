@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德曦中医 - 体质辨识工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8B4513',       // 深棕色（中医主色调）
+                        secondary: '#D2B48C',     // 棕黄色
+                        light: '#F9F5EB',         // 米白色
+                        dark: '#2D2320',          // 深褐色
+                    },
+                    fontFamily: {
+                        sans: ['Noto Serif SC', 'serif'],  // 衬线字体更显传统
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .section-border {
+                @apply border border-secondary border-opacity-30 rounded-lg;
+            }
+            .traditional-bg {
+                @apply bg-light bg-opacity-50;
+            }
+            .clinic-card {
+                @apply bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl;
+            }
+        }
+    </style>
+</head>
+<body class="traditional-bg min-h-screen">
+    <!-- 头部 -->
+    <header class="bg-primary text-white py-4 px-6 shadow-md">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-center md:text-left mb-3 md:mb-0">
+                    <h1 class="text-2xl md:text-3xl font-bold">
+                        <i class="fa fa-heartbeat mr-2"></i>德曦中医
+                    </h1>
+                    <p class="text-sm md:text-base opacity-90 mt-1">传承岐黄之术，呵护生命健康</p>
+                </div>
+                <div class="flex items-center space-x-4 text-sm">
+                    <div class="flex items-center">
+                        <i class="fa fa-map-marker mr-2"></i>
+                        <span>厦门市思明区嘉禾路150号</span>
+                    </div>
+                    <div class="hidden md:block">|</div>
+                    <div class="flex items-center">
+                        <i class="fa fa-phone mr-2"></i>
+                        <span>0592-XXXXXXX</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-sm py-2 px-6 border-b border-secondary border-opacity-30">
+        <div class="container mx-auto flex justify-center">
+            <ul class="flex space-x-6 text-sm md:text-base">
+                <li><a href="#" class="text-primary font-medium"><i class="fa fa-home mr-1"></i>首页</a></li>
+                <li><a href="#" class="text-dark hover:text-primary transition-colors"><i class="fa fa-user-md mr-1"></i>医师团队</a></li>
+                <li><a href="#" class="text-dark hover:text-primary transition-colors"><i class="fa fa-stethoscope mr-1"></i>特色诊疗</a></li>
+                <li><a href="#" class="text-dark hover:text-primary transition-colors"><i class="fa fa-calendar-check-o mr-1"></i>预约挂号</a></li>
+                <li><a href="#" class="text-dark hover:text-primary transition-colors"><i class="fa fa-info-circle mr-1"></i>关于我们</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 介绍部分 -->
+        <div id="intro" class="mb-8 bg-white p-6 rounded-lg shadow-md">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="md:w-2/3">
+                    <h2 class="text-xl font-bold text-dark mb-4">什么是中医体质？</h2>
+                    <p class="mb-4">中医将体质分为9种基本类型：平和质、阳虚质、阴虚质、气虚质、痰湿质、湿热质、血瘀质、气郁质、特禀质。不同体质有不同的养生方法。</p>
+                    <p class="mb-6">本工具通过26道题，帮您判断主要体质类型，并提供针对性的调理建议。如需进一步诊疗，欢迎莅临德曦中医咨询。</p>
+                    <button id="startBtn" class="bg-primary text-white py-2 px-6 rounded-md hover:bg-opacity-90 transition-all inline-flex items-center">
+                        <i class="fa fa-arrow-right mr-2"></i>开始测试
+                    </button>
+                </div>
+                <div class="md:w-1/3 clinic-card">
+                    <div class="p-4">
+                        <h3 class="font-bold text-primary mb-3 flex items-center">
+                            <i class="fa fa-map mr-2"></i>德曦中医馆地址
+                        </h3>
+                        <p class="mb-2"><i class="fa fa-building-o mr-2 text-dark"></i>海山大厦四楼</p>
+                        <p class="mb-2"><i class="fa fa-road mr-2 text-dark"></i>厦门市思明区嘉禾路150号</p>
+                        <p class="mb-4"><i class="fa fa-clock-o mr-2 text-dark"></i>营业时间：周一至周日 8:30-21:00</p>
+                        <a href="https://maps.baidu.com/search/厦门市思明区嘉禾路150号海山大厦四楼" target="_blank" class="text-white bg-secondary hover:bg-opacity-90 py-1.5 px-4 rounded text-sm inline-flex items-center transition-colors">
+                            <i class="fa fa-map-marker mr-1"></i>百度地图导航
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 问卷部分 -->
+        <div id="questionnaire" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-dark">体质测试</h2>
+                <div class="text-sm bg-secondary bg-opacity-30 px-3 py-1 rounded-full">
+                    <span id="currentQuestion">1</span>/<span id="totalQuestions">26</span>
+                </div>
+            </div>
+            
+            <div id="questionCard" class="bg-white rounded-lg shadow-md p-6 mb-4 transition-all duration-300 hover:shadow-lg">
+                <h3 id="questionText" class="text-lg font-medium mb-4"></h3>
+                <div id="options" class="space-y-2"></div>
+            </div>
+            
+            <div class="flex justify-between mt-6">
+                <button id="prevBtn" class="bg-primary text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-all hidden">
+                    <i class="fa fa-arrow-left mr-2"></i>上一题
+                </button>
+                <button id="nextBtn" class="bg-primary text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-all">
+                    <i class="fa fa-arrow-right mr-2"></i>下一题
+                </button>
+                <button id="submitBtn" class="bg-primary text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-all hidden">
+                    <i class="fa fa-check mr-2"></i>提交结果
+                </button>
+            </div>
+        </div>
+
+        <!-- 结果部分 -->
+        <div id="result" class="hidden bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-bold text-dark mb-6 text-center">您的体质分析</h2>
+            
+            <div id="mainConstitution" class="mb-8 p-4 border-l-4 border-primary bg-light rounded">
+                <h3 class="text-lg font-bold mb-2">主要体质：<span id="mainType" class="text-primary"></span></h3>
+                <p id="mainDesc" class="mb-4"></p>
+                <div id="mainSuggest" class="bg-white p-3 rounded shadow-sm">
+                    <h4 class="font-bold mb-2">调理建议：</h4>
+                    <ul id="mainAdvice" class="list-disc pl-5 space-y-1"></ul>
+                </div>
+            </div>
+            
+            <div class="clinic-card p-4 mb-8">
+                <h3 class="font-bold text-primary mb-3 flex items-center">
+                    <i class="fa fa-stethoscope mr-2"></i>专业诊疗建议
+                </h3>
+                <p class="mb-3">若您想获得更精准的体质调理方案，欢迎到德曦中医馆面诊。我们的中医师将根据您的具体情况，提供个性化的诊疗和养生建议。</p>
+                <div class="flex flex-wrap gap-3">
+                    <a href="tel:0592XXXXXXX" class="bg-primary text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-all inline-flex items-center">
+                        <i class="fa fa-phone mr-2"></i>电话咨询
+                    </a>
+                    <a href="https://weixin.qq.com/r/xxxxxxx" target="_blank" class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-all inline-flex items-center">
+                        <i class="fa fa-weixin mr-2"></i>微信预约
+                    </a>
+                    <a href="https://maps.baidu.com/search/厦门市思明区嘉禾路150号海山大厦四楼" target="_blank" class="bg-secondary text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-all inline-flex items-center">
+                        <i class="fa fa-map-marker mr-2"></i>到馆就诊
+                    </a>
+                </div>
+            </div>
+            
+            <div id="otherConstitutions" class="mb-8">
+                <h3 class="text-lg font-bold mb-4">其他倾向体质：</h3>
+                <div id="otherTypes" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+            
+            <button id="restartBtn" class="bg-primary text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-all mx-auto block">
+                <i class="fa fa-refresh mr-2"></i>重新测试
+            </button>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-8 px-6 mt-12">
+        <div class="container mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <i class="fa fa-heartbeat mr-2"></i>德曦中医
+                    </h3>
+                    <p class="text-sm opacity-80 mb-4">德曦中医秉承"以德为本，以曦为明"的理念，汇聚资深中医师，专注于中医辨证施治，为您提供专业的中医诊疗服务。</p>
+                    <div class="flex space-x-3">
+                        <a href="#" class="bg-white bg-opacity-10 w-8 h-8 rounded-full flex items-center justify-center hover:bg-opacity-20 transition-colors">
+                            <i class="fa fa-weixin"></i>
+                        </a>
+                        <a href="#" class="bg-white bg-opacity-10 w-8 h-8 rounded-full flex items-center justify-center hover:bg-opacity-20 transition-colors">
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                        <a href="#" class="bg-white bg-opacity-10 w-8 h-8 rounded-full flex items-center justify-center hover:bg-opacity-20 transition-colors">
+                            <i class="fa fa-qq"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">联系我们</h3>
+                    <ul class="text-sm opacity-80 space-y-2">
+                        <li class="flex items-start">
+                            <i class="fa fa-map-marker mt-1 mr-3 w-4 text-center"></i>
+                            <span>厦门市思明区嘉禾路150号海山大厦四楼</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-phone mr-3 w-4 text-center"></i>
+                            <span>0592-XXXXXXX</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-envelope-o mr-3 w-4 text-center"></i>
+                            <span>dexizhongyi@163.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-clock-o mr-3 w-4 text-center"></i>
+                            <span>8:30-21:00（节假日不休）</span>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">特色服务</h3>
+                    <ul class="text-sm opacity-80 space-y-2">
+                        <li class="flex items-center">
+                            <i class="fa fa-angle-right mr-2"></i>
+                            <span>中医体质辨识与调理</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-angle-right mr-2"></i>
+                            <span>针灸推拿理疗</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-angle-right mr-2"></i>
+                            <span>中药饮片配方</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-angle-right mr-2"></i>
+                            <span>亚健康调理</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-angle-right mr-2"></i>
+                            <span>慢性病中医调理</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-white border-opacity-10 mt-6 pt-6 text-center text-sm opacity-70">
+                <p>© 2023 德曦中医馆 版权所有 | 闽ICP备XXXXXXXX号</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+<script>
+    // 体质数据
+    const constitutionData = {
+        '平和质': {
+            desc: "平和质是理想的体质状态，表现为身体阴阳平衡，气血充足，精力充沛，面色红润，睡眠良好，脾胃功能正常。",
+            advice: [
+                "保持规律作息，劳逸结合",
+                "饮食多样化，不偏食",
+                "坚持适度运动，如散步、太极拳等",
+                "保持积极乐观的心态"
+            ]
+        },
+        '阳虚质': {
+            desc: "阳虚质主要表现为怕冷，手脚发凉，喜欢热饮，容易腹泻，精神不振，舌淡胖嫩。",
+            advice: [
+                "注意保暖，避免受凉",
+                "多吃温热食物，如羊肉、韭菜、生姜等",
+                "少吃生冷寒凉食物",
+                "适当运动，如慢跑、瑜伽，以身体微热不出大汗为宜"
+            ]
+        },
+        '阴虚质': {
+            desc: "阴虚质表现为体内津液不足，容易口干舌燥，手足心热，夜间盗汗，大便干燥，舌红少津。",
+            advice: [
+                "避免熬夜和过度劳累",
+                "多吃滋阴润燥的食物，如百合、银耳、梨、绿豆等",
+                "少吃辛辣刺激性食物",
+                "保持心情舒畅，避免情绪激动"
+            ]
+        },
+        '气虚质': {
+            desc: "气虚质表现为气短乏力，容易疲劳，说话声音低弱，易出汗，舌淡苔白。",
+            advice: [
+                "避免过度劳累，注意休息",
+                "多吃补气食物，如山药、莲子、鸡肉等",
+                "适当进行温和运动，避免剧烈运动",
+                "注意保暖，避免风寒侵袭"
+            ]
+        },
+        '痰湿质': {
+            desc: "痰湿质表现为体型肥胖，身体沉重，容易困倦，胸闷腹胀，大便黏滞，舌苔厚腻。",
+            advice: [
+                "控制饮食量，少吃肥甘厚味",
+                "多吃健脾利湿食物，如薏米、红豆、冬瓜等",
+                "增加运动量，促进气血循环",
+                "避免潮湿环境，保持居住环境干燥"
+            ]
+        },
+        '湿热质': {
+            desc: "湿热质表现为面部油腻，易生痤疮，口苦口臭，大便黏滞不爽，小便黄赤，舌红苔黄腻。",
+            advice: [
+                "饮食清淡，少吃辛辣、油腻、甜食",
+                "多吃清热利湿食物，如绿豆、苦瓜、冬瓜等",
+                "保持规律作息，避免熬夜",
+                "适当增加运动，促进汗液排出"
+            ]
+        },
+        '血瘀质': {
+            desc: "血瘀质表现为面色晦暗，易出现瘀斑，口唇暗淡，女性月经不调或痛经，舌有瘀点。",
+            advice: [
+                "多吃活血化瘀食物，如山楂、桃仁、红糖等",
+                "适当运动，促进血液循环",
+                "保持心情舒畅，避免长期精神紧张",
+                "注意保暖，避免寒冷刺激"
+            ]
+        },
+        '气郁质': {
+            desc: "气郁质表现为情绪低落，多愁善感，容易焦虑，睡眠较差，咽喉部常有异物感，舌淡红。",
+            advice: [
+                "多与人交流，避免独处时间过长",
+                "适当参加集体活动和户外运动",
+                "多吃理气解郁食物，如陈皮、萝卜、柑橘等",
+                "学习放松技巧，如冥想、深呼吸等"
+            ]
+        },
+        '特禀质': {
+            desc: "特禀质主要指过敏体质，表现为容易出现过敏性鼻炎、哮喘、荨麻疹等，对某些食物或环境因素敏感。",
+            advice: [
+                "避免接触过敏原",
+                "饮食清淡，避免食用易过敏食物",
+                "加强体育锻炼，增强体质",
+                "注意环境整洁，减少粉尘、螨虫等刺激"
+            ]
+        }
+    };
+
+    // 问题数据
+    const questions = [
+        // 平和质
+        { text: "您精力充沛吗？", type: "平和质", score: 1 },
+        { text: "您睡眠良好吗？", type: "平和质", score: 1 },
+        { text: "您面色红润有光泽吗？", type: "平和质", score: 1 },
+        
+        // 阳虚质
+        { text: "您手脚发凉吗？", type: "阳虚质", score: 1 },
+        { text: "您喜欢热饮吗？", type: "阳虚质", score: 1 },
+        { text: "您容易腹泻吗？", type: "阳虚质", score: 1 },
+        { text: "您怕冷吗？", type: "阳虚质", score: 1 },
+        
+        // 阴虚质
+        { text: "您口干舌燥吗？", type: "阴虚质", score: 1 },
+        { text: "您手足心发热吗？", type: "阴虚质", score: 1 },
+        { text: "您夜间盗汗吗？", type: "阴虚质", score: 1 },
+        { text: "您大便干燥吗？", type: "阴虚质", score: 1 },
+        
+        // 气虚质
+        { text: "您容易疲劳吗？", type: "气虚质", score: 1 },
+        { text: "您说话声音低弱吗？", type: "气虚质", score: 1 },
+        { text: "您稍微活动就出汗吗？", type: "气虚质", score: 1 },
+        
+        // 痰湿质
+        { text: "您体型偏胖吗？", type: "痰湿质", score: 1 },
+        { text: "您身体沉重吗？", type: "痰湿质", score: 1 },
+        { text: "您容易困倦吗？", type: "痰湿质", score: 1 },
+        { text: "您大便黏滞吗？", type: "痰湿质", score: 1 },
+        
+        // 湿热质
+        { text: "您面部油腻吗？", type: "湿热质", score: 1 },
+        { text: "您容易生痤疮吗？", type: "湿热质", score: 1 },
+        { text: "您口苦口臭吗？", type: "湿热质", score: 1 },
+        
+        // 血瘀质
+        { text: "您面色晦暗吗？", type: "血瘀质", score: 1 },
+        { text: "您容易出现瘀斑吗？", type: "血瘀质", score: 1 },
+        { text: "您女性月经不调或痛经吗？", type: "血瘀质", score: 1 },
+        
+        // 气郁质
+        { text: "您情绪低落吗？", type: "气郁质", score: 1 },
+        { text: "您多愁善感吗？", type: "气郁质", score: 1 },
+        { text: "您睡眠较差吗？", type: "气郁质", score: 1 },
+        
+        // 特禀质
+        { text: "您有过敏性疾病吗（如鼻炎、哮喘等）？", type: "特禀质", score: 1 }
+    ];
+
+    // 选项
+    const options = [
+        { text: "没有", value: 0 },
+        { text: "很少", value: 1 },
+        { text: "有时", value: 2 },
+        { text: "经常", value: 3 },
+        { text: "总是", value: 4 }
+    ];
+
+    // 全局变量
+    let currentQuestionIndex = 0;
+    const answers = {};
+    const scores = {
+        '平和质': 0,
+        '阳虚质': 0,
+        '阴虚质': 0,
+        '气虚质': 0,
+        '痰湿质': 0,
+        '湿热质': 0,
+        '血瘀质': 0,
+        '气郁质': 0,
+        '特禀质': 0
+    };
+
+    // DOM元素
+    const introEl = document.getElementById('intro');
+    const questionnaireEl = document.getElementById('questionnaire');
+    const resultEl = document.getElementById('result');
+    const startBtn = document.getElementById('startBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const questionTextEl = document.getElementById('questionText');
+    const optionsEl = document.getElementById('options');
+    const currentQuestionEl = document.getElementById('currentQuestion');
+    const totalQuestionsEl = document.getElementById('totalQuestions');
+
+    // 初始化
+    totalQuestionsEl.textContent = questions.length;
+
+    // 事件监听
+    startBtn.addEventListener('click', startQuestionnaire);
+    prevBtn.addEventListener('click', goToPrevQuestion);
+    nextBtn.addEventListener('click', goToNextQuestion);
+    submitBtn.addEventListener('click', showResult);
+    restartBtn.addEventListener('click', restart);
+
+    // 开始问卷
+    function startQuestionnaire() {
+        introEl.classList.add('hidden');
+        questionnaireEl.classList.remove('hidden');
+        showQuestion(currentQuestionIndex);
+    }
+
+    // 显示问题
+    function showQuestion(index) {
+        const question = questions[index];
+        questionTextEl.textContent = question.text;
+        currentQuestionEl.textContent = index + 1;
+        
+        // 清空选项
+        optionsEl.innerHTML = '';
+        
+        // 添加选项
+        options.forEach(option => {
+            const button = document.createElement('button');
+            button.className = `border border-secondary py-2 px-4 rounded-md hover:bg-light transition-all mb-2 block w-full text-left ${answers[index] === option.value ? 'bg-primary text-white border-primary' : ''}`;
+            button.innerHTML = `<i class="fa ${answers[index] === option.value ? 'fa-check-circle-o' : 'fa-circle-o'} mr-2"></i>${option.text}`;
+            button.addEventListener('click', () => {
+                // 记录答案
+                answers[index] = option.value;
+                
+                // 更新选中状态
+                document.querySelectorAll('#options button').forEach(btn => {
+                    btn.classList.remove('bg-primary', 'text-white', 'border-primary');
+                    btn.innerHTML = btn.innerHTML.replace('fa-check-circle-o', 'fa-circle-o');
+                });
+                button.classList.add('bg-primary', 'text-white', 'border-primary');
+                button.innerHTML = button.innerHTML.replace('fa-circle-o', 'fa-check-circle-o');
+            });
+            optionsEl.appendChild(button);
+        });
+        
+        // 更新按钮状态
+        prevBtn.classList.toggle('hidden', index === 0);
+        if (index === questions.length - 1) {
+            nextBtn.classList.add('hidden');
+            submitBtn.classList.remove('hidden');
+        } else {
+            nextBtn.classList.remove('hidden');
+            submitBtn.classList.add('hidden');
+        }
+    }
+
+    // 上一题
+    function goToPrevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            showQuestion(currentQuestionIndex);
+        }
+    }
+
+    // 下一题
+    function goToNextQuestion() {
+        // 检查是否已回答
+        if (answers[currentQuestionIndex] === undefined) {
+            alert('请选择一个选项');
+            return;
+        }
+        
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            showQuestion(currentQuestionIndex);
+        }
+    }
+
+    // 计算得分
+    function calculateScores() {
+        // 重置分数
+        Object.keys(scores).forEach(key => {
+            scores[key] = 0;
+        });
+        
+        // 计算各体质得分
+        questions.forEach((question, index) => {
+            if (answers[index] !== undefined) {
+                scores[question.type] += answers[index] * question.score;
+            }
+        });
+        
+        // 平和质特殊处理（需要反向计分）
+        if (scores['平和质'] > 0) {
+            scores['平和质'] = 24 - scores['平和质']; // 反向计分
+        }
+        
+        return scores;
+    }
+
+    // 显示结果
+    function showResult() {
+        // 检查是否所有问题都已回答
+        for (let i = 0; i < questions.length; i++) {
+            if (answers[i] === undefined) {
+                alert('请回答所有问题');
+                return;
+            }
+        }
+        
+        // 计算得分
+        const scores = calculateScores();
+        
+        // 找出最高得分的体质
+        let maxScore = -1;
+        let mainType = '';
+        
+        Object.keys(scores).forEach(type => {
+            if (scores[type] > maxScore) {
+                maxScore = scores[type];
+                mainType = type;
+            }
+        });
+        
+        // 显示主要体质
+        document.getElementById('mainType').textContent = mainType;
+        document.getElementById('mainDesc').textContent = constitutionData[mainType].desc;
+        
+        // 显示主要体质的建议
+        const mainAdviceEl = document.getElementById('mainAdvice');
+        mainAdviceEl.innerHTML = '';
+        constitutionData[mainType].advice.forEach(advice => {
+            const li = document.createElement('li');
+            li.textContent = advice;
+            mainAdviceEl.appendChild(li);
+        });
+        
+        // 显示其他倾向体质（得分大于0的）
+        const otherTypesEl = document.getElementById('otherTypes');
+        otherTypesEl.innerHTML = '';
+        
+        Object.keys(scores).forEach(type => {
+            if (type !== mainType && scores[type] > 0) {
+                const card = document.createElement('div');
+                card.className = 'bg-light p-3 rounded shadow-sm';
+                
+                const title = document.createElement('h4');
+                title.className = 'font-bold text-primary';
+                title.textContent = type;
+                
+                const desc = document.createElement('p');
+                desc.className = 'text-sm mt-1';
+                desc.textContent = constitutionData[type].desc.substring(0, 60) + '...';
+                
+                card.appendChild(title);
+                card.appendChild(desc);
+                otherTypesEl.appendChild(card);
+            }
+        });
+        
+        // 显示结果部分
+        questionnaireEl.classList.add('hidden');
+        resultEl.classList.remove('hidden');
+    }
+
+    // 重新测试
+    function restart() {
+        // 重置状态
+        currentQuestionIndex = 0;
+        Object.keys(answers).forEach(key => delete answers[key]);
+        
+        // 隐藏结果，显示介绍
+        resultEl.classList.add('hidden');
+        introEl.classList.remove('hidden');
+    }
+</script>
+</html>
